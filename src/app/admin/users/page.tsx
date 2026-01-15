@@ -1,21 +1,10 @@
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Users, Search, ArrowLeft } from "lucide-react";
+import { Users, Search } from "lucide-react";
 import { getCurrentUser, getAllStudents } from "@/lib/supabase/queries";
 import { AdminSidebar } from "@/components/admin-sidebar";
-import Link from "next/link";
 
 export default async function AdminUsersPage() {
     const user = await getCurrentUser();
@@ -27,98 +16,78 @@ export default async function AdminUsersPage() {
     const students = await getAllStudents();
 
     return (
-        <div className="min-h-screen bg-[#fafafa]">
+        <div className="min-h-screen bg-background">
             <AdminSidebar user={user} activePage="users" />
 
-            {/* Main Content */}
-            <main className="ml-64 p-8">
+            <main className="lg:ml-56 pt-14 lg:pt-0 w-full max-w-5xl px-4 md:px-6 py-6 md:py-8 space-y-6">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="icon" asChild>
-                            <Link href="/admin">
-                                <ArrowLeft className="h-4 w-4" />
-                            </Link>
-                        </Button>
-                        <div>
-                            <h1 className="text-3xl font-bold">Students</h1>
-                            <p className="text-muted-foreground">
-                                Manage your students and their enrollments
-                            </p>
-                        </div>
-                    </div>
+                <div>
+                    <h1 className="text-xl font-semibold">Students</h1>
+                    <p className="text-sm text-muted-foreground">
+                        {students.length} total students
+                    </p>
                 </div>
 
                 {/* Search */}
-                <div className="flex flex-col gap-4 mb-8 md:flex-row md:items-center">
-                    <div className="relative flex-1 max-w-md">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder="Search students..."
-                            className="pl-10 bg-white border-0 shadow-premium"
-                        />
-                    </div>
+                <div className="relative max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        placeholder="Search students..."
+                        className="pl-10 h-9 text-sm rounded-full border-border/50"
+                    />
                 </div>
 
-                {/* Students Table */}
-                <Card className="shadow-premium border-0 bg-white">
-                    <CardHeader>
-                        <CardTitle>All Students</CardTitle>
-                        <CardDescription>
-                            {students.length} total students
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {students.length === 0 ? (
-                            <div className="text-center py-12 text-muted-foreground">
-                                <Users className="h-12 w-12 mx-auto mb-4" />
-                                <h3 className="text-lg font-semibold mb-2">No students yet</h3>
-                                <p>Students will appear here when they sign up.</p>
+                {/* Students List */}
+                {students.length === 0 ? (
+                    <div className="rounded-xl border border-border/50 bg-card p-12 text-center">
+                        <Users className="h-10 w-10 mx-auto mb-4 text-muted-foreground" />
+                        <h3 className="text-base font-semibold mb-1">No students yet</h3>
+                        <p className="text-sm text-muted-foreground">Students will appear here when they sign up.</p>
+                    </div>
+                ) : (
+                    <div className="space-y-2">
+                        {students.map((student) => (
+                            <div
+                                key={student.id}
+                                className="rounded-xl border border-border/50 bg-card p-4 hover:border-border transition-colors"
+                            >
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                                    {/* Avatar & Info */}
+                                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                                        <Avatar className="h-9 w-9 shrink-0">
+                                            <AvatarImage src={student.avatar_url || ""} />
+                                            <AvatarFallback className="text-[10px] bg-foreground text-background">
+                                                {student.full_name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'U'}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-semibold truncate">{student.full_name || 'Unknown'}</p>
+                                            <p className="text-[10px] text-muted-foreground truncate">{student.email}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Stats */}
+                                    <div className="flex items-center gap-4 text-xs sm:ml-auto pl-12 sm:pl-0">
+                                        <div>
+                                            <span className="text-muted-foreground">Courses: </span>
+                                            <span className="font-medium">{student.enrolled_count}</span>
+                                        </div>
+                                        <div className="hidden sm:block">
+                                            <span className="text-muted-foreground">Joined: </span>
+                                            <span className="font-medium">{new Date(student.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                        <Badge
+                                            variant="outline"
+                                            className="rounded-full px-2 py-0.5 text-[10px] border-0 bg-emerald-500/10 text-emerald-500"
+                                        >
+                                            Active
+                                        </Badge>
+                                    </div>
+                                </div>
                             </div>
-                        ) : (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Student</TableHead>
-                                        <TableHead>Email</TableHead>
-                                        <TableHead>Courses Enrolled</TableHead>
-                                        <TableHead>Joined</TableHead>
-                                        <TableHead>Status</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {students.map((student) => (
-                                        <TableRow key={student.id}>
-                                            <TableCell>
-                                                <div className="flex items-center gap-3">
-                                                    <Avatar className="h-8 w-8">
-                                                        <AvatarImage src={student.avatar_url || ""} />
-                                                        <AvatarFallback className="bg-[#171717] text-white">
-                                                            {student.full_name?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'U'}
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                    <span className="font-medium">{student.full_name || 'Unknown'}</span>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground">
-                                                {student.email}
-                                            </TableCell>
-                                            <TableCell>
-                                                {student.enrolled_count}
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground">
-                                                {new Date(student.created_at).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant="secondary">Active</Badge>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        )}
-                    </CardContent>
-                </Card>
+                        ))}
+                    </div>
+                )}
             </main>
         </div>
     );

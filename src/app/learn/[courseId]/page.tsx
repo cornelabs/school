@@ -1,17 +1,13 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
-    GraduationCap,
-    Play,
     Check,
     Clock,
     BookOpen,
     LayoutDashboard,
-    List,
     ChevronLeft,
     ChevronRight,
 } from "lucide-react";
@@ -73,7 +69,7 @@ export default async function LearnPage({ params, searchParams }: LearnPageProps
     const isLessonCompleted = progress.some(p => p.lesson_id === currentLesson.id && p.completed);
 
     return (
-        <div className="min-h-screen bg-background flex">
+        <div className="min-h-screen bg-background">
             {/* Sidebar */}
             <LessonSidebar
                 course={course}
@@ -85,22 +81,20 @@ export default async function LearnPage({ params, searchParams }: LearnPageProps
             />
 
             {/* Main Content */}
-            <main className="flex-1 ml-80">
+            <main className="lg:ml-72">
                 {/* Top Bar */}
-                <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4">
-                    <div className="flex items-center gap-3">
-                        <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
-                            <LayoutDashboard className="h-4 w-4 inline mr-1" />
+                <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/50 bg-card px-4 md:px-6">
+                    <div className="flex items-center gap-2 min-w-0 text-sm">
+                        <Link href="/dashboard" className="text-muted-foreground hover:text-foreground shrink-0 hidden sm:flex items-center">
+                            <LayoutDashboard className="h-4 w-4 mr-1" />
                             Dashboard
                         </Link>
-                        <span className="text-muted-foreground">/</span>
-                        <span className="text-sm font-medium">{course.title}</span>
+                        <span className="text-muted-foreground hidden sm:inline">/</span>
+                        <span className="font-medium truncate">{course.title}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Badge variant="outline">
-                            Lesson {currentIndex + 1} of {allLessons.length}
-                        </Badge>
-                    </div>
+                    <Badge variant="outline" className="rounded-full px-2 py-0.5 text-[10px] shrink-0">
+                        Lesson {currentIndex + 1} of {allLessons.length}
+                    </Badge>
                 </header>
 
                 {/* Video Player */}
@@ -110,50 +104,50 @@ export default async function LearnPage({ params, searchParams }: LearnPageProps
                 />
 
                 {/* Lesson Info */}
-                <div className="max-w-4xl mx-auto p-6">
-                    <div className="flex items-start justify-between gap-4 mb-6">
+                <div className="max-w-4xl mx-auto px-4 md:px-6 py-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
                         <div>
-                            <h1 className="text-2xl font-bold mb-2">{currentLesson.title}</h1>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <h1 className="text-lg font-semibold mb-1">{currentLesson.title}</h1>
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                 <span className="flex items-center gap-1">
-                                    <Clock className="h-4 w-4" />
+                                    <Clock className="h-3 w-3" />
                                     {currentLesson.duration_seconds
                                         ? `${Math.floor(currentLesson.duration_seconds / 60)}:${(currentLesson.duration_seconds % 60).toString().padStart(2, '0')}`
                                         : 'Duration TBD'
                                     }
                                 </span>
                                 <span className="flex items-center gap-1">
-                                    <BookOpen className="h-4 w-4" />
+                                    <BookOpen className="h-3 w-3" />
                                     {currentModule?.title}
                                 </span>
                             </div>
                         </div>
-                        {isLessonCompleted ? (
-                            <Badge className="bg-green-500">
+                        {isLessonCompleted && (
+                            <Badge className="rounded-full px-2 py-0.5 text-[10px] bg-emerald-500/10 text-emerald-500 border-0 shrink-0">
                                 <Check className="mr-1 h-3 w-3" />
                                 Completed
                             </Badge>
-                        ) : null}
+                        )}
                     </div>
 
                     {currentLesson.description && (
                         <>
-                            <Separator className="my-6" />
-                            <div className="prose prose-neutral dark:prose-invert max-w-none">
-                                <h3>About this lesson</h3>
-                                <p>{currentLesson.description}</p>
+                            <Separator className="my-6 border-border/50" />
+                            <div className="space-y-2">
+                                <h3 className="text-sm font-semibold">About this lesson</h3>
+                                <p className="text-xs text-muted-foreground">{currentLesson.description}</p>
                             </div>
                         </>
                     )}
 
-                    <Separator className="my-6" />
+                    <Separator className="my-6 border-border/50" />
 
                     {/* Navigation */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-4">
                         {prevLesson ? (
-                            <Button variant="outline" asChild>
+                            <Button variant="outline" className="h-9 px-4 text-xs rounded-full" asChild>
                                 <Link href={`/learn/${courseId}?lesson=${prevLesson.id}`}>
-                                    <ChevronLeft className="mr-2 h-4 w-4" />
+                                    <ChevronLeft className="mr-1 h-3 w-3" />
                                     Previous
                                 </Link>
                             </Button>
@@ -161,21 +155,21 @@ export default async function LearnPage({ params, searchParams }: LearnPageProps
                             <div />
                         )}
                         {nextLesson ? (
-                            <Button asChild>
+                            <Button className="h-9 px-4 text-xs rounded-full" asChild>
                                 <Link href={`/learn/${courseId}?lesson=${nextLesson.id}`}>
                                     Next
-                                    <ChevronRight className="ml-2 h-4 w-4" />
+                                    <ChevronRight className="ml-1 h-3 w-3" />
                                 </Link>
                             </Button>
                         ) : overallProgress === 100 ? (
-                            <Button asChild>
+                            <Button className="h-9 px-4 text-xs rounded-full" asChild>
                                 <Link href="/dashboard">
                                     Complete Course
-                                    <Check className="ml-2 h-4 w-4" />
+                                    <Check className="ml-1 h-3 w-3" />
                                 </Link>
                             </Button>
                         ) : (
-                            <Button disabled>
+                            <Button className="h-9 px-4 text-xs rounded-full" disabled>
                                 Complete all lessons
                             </Button>
                         )}

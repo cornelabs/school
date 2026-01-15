@@ -47,7 +47,7 @@ export default async function AdminDashboard() {
         <div className="min-h-screen bg-background">
             <AdminSidebar user={user} activePage="dashboard" />
 
-            <main className="ml-64 w-full max-w-5xl px-6 py-8 space-y-6">
+            <main className="lg:ml-56 pt-14 lg:pt-0 w-full max-w-5xl px-4 md:px-6 py-6 md:py-8 space-y-6">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -112,8 +112,8 @@ export default async function AdminDashboard() {
                                                     <Badge
                                                         variant="outline"
                                                         className={`rounded-full px-2 py-0.5 text-[10px] border-0 ${course.status === "published"
-                                                                ? "bg-emerald-500/10 text-emerald-500"
-                                                                : "bg-muted text-muted-foreground"
+                                                            ? "bg-emerald-500/10 text-emerald-500"
+                                                            : "bg-muted text-muted-foreground"
                                                             }`}
                                                     >
                                                         {course.status}

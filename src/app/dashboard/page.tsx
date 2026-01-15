@@ -72,13 +72,13 @@ export default async function DashboardPage() {
             <AppSidebar user={user} />
             <SidebarInset>
                 {/* Header */}
-                <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border/50 px-6">
+                <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border/50 px-4 md:px-6">
                     <SidebarTrigger className="-ml-1" />
                     <Separator orientation="vertical" className="mr-2 h-4" />
                     <h1 className="text-sm font-medium">Dashboard</h1>
                 </header>
 
-                <main className="w-full max-w-5xl mx-auto px-6 py-8 space-y-6">
+                <main className="w-full max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-8 space-y-6">
                     {/* Welcome Section */}
                     <div>
                         <h2 className="text-xl font-semibold">Welcome back, {user.full_name?.split(' ')[0] || 'Student'}!</h2>

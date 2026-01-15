@@ -51,20 +51,20 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
             <AppSidebar user={user} />
             <SidebarInset>
                 {/* Header */}
-                <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border/50 px-6">
+                <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border/50 px-4 md:px-6">
                     <SidebarTrigger className="-ml-1" />
                     <Separator orientation="vertical" className="mr-2 h-4" />
-                    <div className="flex items-center gap-2 text-sm">
-                        <Link href="/courses" className="text-muted-foreground hover:text-foreground">
+                    <div className="flex items-center gap-2 text-sm min-w-0">
+                        <Link href="/courses" className="text-muted-foreground hover:text-foreground shrink-0">
                             Courses
                         </Link>
                         <span className="text-muted-foreground">/</span>
-                        <span className="font-medium truncate max-w-[200px]">{course.title}</span>
+                        <span className="font-medium truncate">{course.title}</span>
                     </div>
                 </header>
 
-                <main className="w-full max-w-5xl mx-auto px-6 py-8">
-                    <div className="grid gap-8 lg:grid-cols-3">
+                <main className="w-full max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-8">
+                    <div className="flex flex-col-reverse lg:grid lg:grid-cols-3 gap-6 lg:gap-8">
                         {/* Main Content */}
                         <div className="lg:col-span-2 space-y-6">
                             {/* Course Header */}
