@@ -1,7 +1,3 @@
--- =============================================
--- SCHOOL LMS - SUPABASE DATABASE SCHEMA
--- Run this in your Supabase SQL Editor
--- =============================================
 
 -- Enable UUID extension
 create extension if not exists "uuid-ossp";
