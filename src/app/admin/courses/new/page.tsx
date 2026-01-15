@@ -127,20 +127,26 @@ export default function NewCoursePage() {
                     // Upload video if exists
                     let videoUrl = null;
                     if (lesson.videoFile) {
+                        toast.info(`Uploading video: ${lesson.videoFile.name}...`);
                         const fileName = `${course.id}/${Date.now()}-${lesson.videoFile.name}`;
                         const { data: videoData, error: videoError } = await supabase.storage
                             .from('course-videos')
                             .upload(fileName, lesson.videoFile);
 
-                        if (!videoError && videoData) {
+                        if (videoError) {
+                            console.error('Video upload error:', videoError);
+                            toast.error(`Video upload failed: ${videoError.message}`);
+                        } else if (videoData) {
                             const { data: { publicUrl } } = supabase.storage
                                 .from('course-videos')
                                 .getPublicUrl(videoData.path);
                             videoUrl = publicUrl;
+                            toast.success('Video uploaded!');
+                            console.log('Video URL:', videoUrl);
                         }
                     }
 
-                    await supabase.from('lessons').insert({
+                    const { error: lessonError } = await supabase.from('lessons').insert({
                         module_id: createdModule.id,
                         title: lesson.title,
                         description: lesson.description,
@@ -148,6 +154,13 @@ export default function NewCoursePage() {
                         order_index: li,
                         type: 'video',
                     });
+
+                    if (lessonError) {
+                        console.error('Lesson insert error:', lessonError);
+                        toast.error(`Failed to create lesson: ${lessonError.message}`);
+                    } else {
+                        console.log(`Lesson created with video_url: ${videoUrl}`);
+                    }
                 }
             }
 

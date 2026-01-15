@@ -65,6 +65,11 @@ const navItems = [
 export function AppSidebar({ user }: AppSidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const handleLogout = async () => {
         const supabase = createClient();
@@ -73,6 +78,11 @@ export function AppSidebar({ user }: AppSidebarProps) {
         router.push("/login");
         router.refresh();
     };
+
+    // Prevent hydration mismatch by not rendering until mounted
+    if (!mounted) {
+        return null;
+    }
 
     return (
         <Sidebar collapsible="icon">

@@ -24,31 +24,48 @@ export default async function DashboardPage() {
 
     const enrollments = await getUserEnrollments(user.id);
 
-    // Calculate stats
-    const enrolledCount = enrollments.length;
-    const completedCount = enrollments.filter(e => e.status === 'completed').length;
-
     // Get progress for all enrolled courses
     const enrollmentsWithProgress = await Promise.all(
         enrollments.map(async (enrollment) => {
             const progress = await getUserProgress(user.id, enrollment.course_id);
             const completedLessons = progress.filter(p => p.completed).length;
-            const totalLessons = progress.length || 1;
-            const progressPercent = Math.round((completedLessons / totalLessons) * 100);
+
+            // Get total lesson count from course modules
+            const course = enrollment.course;
+            let totalLessons = 0;
+            if (course?.modules) {
+                totalLessons = course.modules.reduce((acc: number, m: any) =>
+                    acc + (m.lessons?.length || 0), 0);
+            }
+
+            // If we have progress data, use that length as fallback
+            if (totalLessons === 0) {
+                totalLessons = progress.length || 1;
+            }
+
+            const progressPercent = totalLessons > 0
+                ? Math.round((completedLessons / totalLessons) * 100)
+                : 0;
 
             return {
                 ...enrollment,
                 completedLessons,
-                totalLessons: progress.length,
+                totalLessons,
                 progressPercent: isNaN(progressPercent) ? 0 : progressPercent,
+                isCompleted: progressPercent === 100,
             };
         })
     );
 
+    // Calculate stats based on actual progress
+    const enrolledCount = enrollments.length;
+    const completedCount = enrollmentsWithProgress.filter(e => e.isCompleted).length;
+    const inProgressCount = enrolledCount - completedCount;
+
     const stats = [
         { label: "Courses Enrolled", value: enrolledCount.toString(), icon: BookOpen },
         { label: "Completed", value: completedCount.toString(), icon: Award },
-        { label: "In Progress", value: (enrolledCount - completedCount).toString(), icon: Play },
+        { label: "In Progress", value: inProgressCount.toString(), icon: Play },
     ];
 
     return (

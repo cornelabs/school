@@ -60,8 +60,12 @@ export function LessonSidebar({
                 {/* Header */}
                 <div className="flex h-16 items-center justify-between border-b px-4">
                     <Link href="/dashboard" className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                            <GraduationCap className="h-4 w-4 text-primary-foreground" />
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f5f5f5]">
+                            <img
+                                src="/icononly_transparent_nobuffer.png"
+                                alt="Logo"
+                                className="h-5 w-5"
+                            />
                         </div>
                         <span className="font-bold">School</span>
                     </Link>
@@ -96,17 +100,17 @@ export function LessonSidebar({
                                             key={lesson.id}
                                             href={`/learn/${course.id}?lesson=${lesson.id}`}
                                             className={`flex items-center gap-3 p-2 rounded-lg text-sm transition-colors ${isCurrent
-                                                    ? 'bg-primary/10 text-primary'
-                                                    : isCompleted
-                                                        ? 'text-muted-foreground hover:bg-muted'
-                                                        : 'hover:bg-muted'
+                                                ? 'bg-primary/10 text-primary'
+                                                : isCompleted
+                                                    ? 'text-muted-foreground hover:bg-muted'
+                                                    : 'hover:bg-muted'
                                                 }`}
                                         >
                                             <div className={`flex h-6 w-6 items-center justify-center rounded-full shrink-0 ${isCompleted
-                                                    ? 'bg-green-500 text-white'
-                                                    : isCurrent
-                                                        ? 'bg-primary text-primary-foreground'
-                                                        : 'border-2'
+                                                ? 'bg-green-500 text-white'
+                                                : isCurrent
+                                                    ? 'bg-primary text-primary-foreground'
+                                                    : 'border-2'
                                                 }`}>
                                                 {isCompleted ? (
                                                     <Check className="h-3 w-3" />
