@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# School - AI Learning Platform
+
+A modern Learning Management System (LMS) focused on AI education. Built with Next.js, Supabase, and Tailwind CSS.
+
+![School LMS](https://school.cornelabs.com/og-image.png)
+
+## Features
+
+- **Student Portal**: Browse courses, enroll, track progress
+- **Video Lessons**: Watch course content with progress tracking
+- **Admin Panel**: Create courses, manage content, upload videos
+- **Authentication**: Secure signup/login with role-based access
+
+## Tech Stack
+
+- **Framework**: Next.js 14+ (App Router)
+- **Database**: Supabase (PostgreSQL)
+- **Auth**: Supabase Auth
+- **Storage**: Supabase Storage
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Deployment**: Vercel
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/bolasbanjo/school.git
+cd school
+npm install
+```
+
+### 2. Set up Supabase
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. Run the schema in SQL Editor:
+   ```bash
+   # Copy contents of supabase/schema.sql
+   ```
+3. Create storage buckets:
+   - `course-videos` (public)
+   - `thumbnails` (public)
+
+### 3. Configure Environment
+
+Create `.env.local`:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── admin/          # Admin dashboard & course management
+│   ├── auth/           # Auth callback
+│   ├── courses/        # Public course catalog
+│   ├── dashboard/      # Student dashboard
+│   ├── learn/          # Video player
+│   ├── login/          # Login page
+│   └── signup/         # Signup page
+├── components/         # Reusable components
+├── lib/supabase/       # Supabase client & queries
+└── types/              # TypeScript definitions
+```
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+Deploy to Vercel:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Push to GitHub
+2. Import in [Vercel](https://vercel.com)
+3. Add environment variables
+4. Deploy!
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
