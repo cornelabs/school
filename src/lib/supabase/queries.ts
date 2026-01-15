@@ -456,6 +456,24 @@ export async function getRecentStudents(limit = 5) {
     })) || [];
 }
 
+export async function getAllStudents() {
+    const supabase = await createClient();
+
+    const { data } = await supabase
+        .from('profiles')
+        .select(`
+      *,
+      enrollments:enrollments(count)
+    `)
+        .eq('role', 'student')
+        .order('created_at', { ascending: false });
+
+    return data?.map(student => ({
+        ...student,
+        enrolled_count: student.enrollments?.[0]?.count || 0,
+    })) || [];
+}
+
 // =============================================
 // FILE UPLOAD
 // =============================================

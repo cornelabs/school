@@ -30,7 +30,6 @@ export function SharedHeader({ user, currentPage }: SharedHeaderProps) {
                         className="invert"
                     />
                 </Link>
-
                 {/* Navigation */}
                 <nav className="hidden items-center gap-8 md:flex">
                     <Link
