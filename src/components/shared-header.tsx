@@ -29,7 +29,6 @@ export function SharedHeader({ user, currentPage }: SharedHeaderProps) {
                         height={32}
                         className="invert"
                     />
-                    <span className="text-lg font-semibold text-white">School</span>
                 </Link>
 
                 {/* Navigation */}
@@ -37,8 +36,8 @@ export function SharedHeader({ user, currentPage }: SharedHeaderProps) {
                     <Link
                         href="/dashboard"
                         className={`flex items-center gap-2 text-sm font-medium transition-colors ${currentPage === 'dashboard'
-                                ? 'text-white'
-                                : 'text-gray-400 hover:text-white'
+                            ? 'text-white'
+                            : 'text-gray-400 hover:text-white'
                             }`}
                     >
                         Dashboard
@@ -46,8 +45,8 @@ export function SharedHeader({ user, currentPage }: SharedHeaderProps) {
                     <Link
                         href="/courses"
                         className={`flex items-center gap-2 text-sm font-medium transition-colors ${currentPage === 'courses'
-                                ? 'text-white'
-                                : 'text-gray-400 hover:text-white'
+                            ? 'text-white'
+                            : 'text-gray-400 hover:text-white'
                             }`}
                     >
                         Courses
