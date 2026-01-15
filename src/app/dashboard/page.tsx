@@ -1,23 +1,17 @@
 import Link from "next/link";
-import Image from "next/image";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     BookOpen,
     Play,
     ArrowRight,
-    Clock,
     Award,
-    LayoutDashboard,
-    LogOut
 } from "lucide-react";
 import { getCurrentUser, getUserEnrollments, getUserProgress } from "@/lib/supabase/queries";
-import { createClient } from "@/lib/supabase/server";
-import { LogoutButton } from "@/components/logout-button";
+import { SharedHeader } from "@/components/shared-header";
 
 export default async function DashboardPage() {
     const user = await getCurrentUser();
@@ -56,39 +50,8 @@ export default async function DashboardPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-background">
-            {/* Header */}
-            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-                <div className="container mx-auto flex h-16 items-center justify-between px-4">
-                    <Link href="/" className="flex items-center gap-2">
-                        <Image
-                            src="/icononly_transparent_nobuffer.png"
-                            alt="School Logo"
-                            width={36}
-                            height={36}
-                        />
-                    </Link>
-                    <nav className="flex items-center gap-4">
-                        <Link href="/dashboard" className="flex items-center gap-2 text-sm font-medium">
-                            <LayoutDashboard className="h-4 w-4" />
-                            Dashboard
-                        </Link>
-                        <Link href="/courses" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground">
-                            <BookOpen className="h-4 w-4" />
-                            Courses
-                        </Link>
-                    </nav>
-                    <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8">
-                            <AvatarImage src={user.avatar_url || ''} />
-                            <AvatarFallback>
-                                {user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
-                            </AvatarFallback>
-                        </Avatar>
-                        <LogoutButton />
-                    </div>
-                </div>
-            </header>
+        <div className="min-h-screen bg-[#fafafa]">
+            <SharedHeader user={user} currentPage="dashboard" />
 
             <main className="container mx-auto px-4 py-8">
                 {/* Welcome Section */}
@@ -100,10 +63,10 @@ export default async function DashboardPage() {
                 {/* Stats Grid */}
                 <div className="grid gap-4 md:grid-cols-3 mb-8">
                     {stats.map((stat, index) => (
-                        <Card key={index}>
+                        <Card key={index} className="shadow-premium border-0 bg-white">
                             <CardContent className="flex items-center gap-4 p-6">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                                    <stat.icon className="h-6 w-6 text-primary" />
+                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f5f5f5]">
+                                    <stat.icon className="h-6 w-6 text-[#171717]" />
                                 </div>
                                 <div>
                                     <p className="text-2xl font-bold">{stat.value}</p>
@@ -127,7 +90,7 @@ export default async function DashboardPage() {
                     </div>
 
                     {enrollmentsWithProgress.length === 0 ? (
-                        <Card className="text-center py-12">
+                        <Card className="text-center py-12 shadow-premium border-0 bg-white">
                             <CardContent>
                                 <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                                 <h3 className="text-lg font-semibold mb-2">No courses yet</h3>
@@ -143,10 +106,10 @@ export default async function DashboardPage() {
                     ) : (
                         <div className="grid gap-4 md:grid-cols-2">
                             {enrollmentsWithProgress.map((enrollment) => (
-                                <Card key={enrollment.id}>
+                                <Card key={enrollment.id} className="shadow-premium border-0 bg-white card-hover">
                                     <CardContent className="p-6">
                                         <div className="flex gap-4">
-                                            <div className="h-24 w-32 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                                            <div className="h-24 w-32 rounded-lg bg-[#f5f5f5] flex items-center justify-center shrink-0">
                                                 {enrollment.course?.thumbnail_url ? (
                                                     <img
                                                         src={enrollment.course.thumbnail_url}

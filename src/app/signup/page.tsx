@@ -64,8 +64,8 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
-            <Card className="w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center bg-[#fafafa] p-4">
+            <Card className="w-full max-w-md shadow-premium-lg border-0">
                 <CardHeader className="text-center">
                     <Link href="/" className="inline-flex items-center justify-center gap-2 mb-4">
                         <Image

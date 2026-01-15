@@ -6,7 +6,12 @@ import { LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 
-export function LogoutButton() {
+interface LogoutButtonProps {
+    variant?: "default" | "ghost" | "outline" | "secondary" | "destructive" | "link";
+    className?: string;
+}
+
+export function LogoutButton({ variant = "ghost", className }: LogoutButtonProps) {
     const router = useRouter();
 
     const handleLogout = async () => {
@@ -18,7 +23,7 @@ export function LogoutButton() {
     };
 
     return (
-        <Button variant="ghost" size="icon" onClick={handleLogout}>
+        <Button variant={variant} size="icon" onClick={handleLogout} className={className}>
             <LogOut className="h-4 w-4" />
         </Button>
     );

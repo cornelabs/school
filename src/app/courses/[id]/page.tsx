@@ -1,19 +1,17 @@
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
     BookOpen,
-    GraduationCap,
     Clock,
     Play,
-    Check,
-    Users,
 } from "lucide-react";
 import { getCourseWithContent, getCurrentUser, isEnrolled } from "@/lib/supabase/queries";
 import { EnrollButton } from "@/components/enroll-button";
+import { SharedHeader } from "@/components/shared-header";
 
 interface CourseDetailPageProps {
     params: Promise<{ id: string }>;
@@ -22,13 +20,13 @@ interface CourseDetailPageProps {
 function getDifficultyColor(difficulty: string) {
     switch (difficulty) {
         case "beginner":
-            return "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400";
+            return "bg-green-100 text-green-700";
         case "intermediate":
-            return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400";
+            return "bg-yellow-100 text-yellow-700";
         case "advanced":
-            return "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
+            return "bg-red-100 text-red-700";
         default:
-            return "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400";
+            return "bg-gray-100 text-gray-700";
     }
 }
 
@@ -49,39 +47,8 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
     );
 
     return (
-        <div className="min-h-screen bg-background">
-            {/* Header */}
-            <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
-                <div className="container mx-auto flex h-16 items-center justify-between px-4">
-                    <Link href="/" className="flex items-center gap-2">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-                            <GraduationCap className="h-5 w-5 text-primary-foreground" />
-                        </div>
-                        <span className="text-xl font-bold">School</span>
-                    </Link>
-                    <nav className="hidden items-center gap-6 md:flex">
-                        <Link href="/courses" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-                            Courses
-                        </Link>
-                    </nav>
-                    <div className="flex items-center gap-3">
-                        {user ? (
-                            <Button asChild>
-                                <Link href="/dashboard">Dashboard</Link>
-                            </Button>
-                        ) : (
-                            <>
-                                <Button variant="ghost" asChild>
-                                    <Link href="/login">Sign In</Link>
-                                </Button>
-                                <Button asChild>
-                                    <Link href="/signup">Get Started</Link>
-                                </Button>
-                            </>
-                        )}
-                    </div>
-                </div>
-            </header>
+        <div className="min-h-screen bg-[#fafafa]">
+            <SharedHeader user={user} currentPage="courses" />
 
             <main className="container mx-auto px-4 py-8">
                 <div className="grid gap-8 lg:grid-cols-3">
@@ -91,9 +58,9 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
                         <div className="mb-8">
                             <div className="flex items-center gap-2 mb-4">
                                 {course.category && (
-                                    <Badge variant="outline">{course.category}</Badge>
+                                    <Badge variant="outline" className="border-[#e5e5e5]">{course.category}</Badge>
                                 )}
-                                <Badge className={getDifficultyColor(course.difficulty)}>
+                                <Badge className={`border-0 ${getDifficultyColor(course.difficulty)}`}>
                                     {course.difficulty.charAt(0).toUpperCase() + course.difficulty.slice(1)}
                                 </Badge>
                             </div>
@@ -125,7 +92,7 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
                             <h2 className="text-2xl font-bold mb-6">Curriculum</h2>
                             <div className="space-y-4">
                                 {course.modules.map((module, moduleIndex) => (
-                                    <Card key={module.id}>
+                                    <Card key={module.id} className="shadow-premium border-0 bg-white">
                                         <CardHeader className="pb-3">
                                             <CardTitle className="text-lg">
                                                 {moduleIndex + 1}. {module.title}
@@ -136,12 +103,12 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
                                         </CardHeader>
                                         <CardContent className="pt-0">
                                             <div className="space-y-2">
-                                                {module.lessons.map((lesson, lessonIndex) => (
+                                                {module.lessons.map((lesson) => (
                                                     <div
                                                         key={lesson.id}
-                                                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted"
+                                                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#f5f5f5] transition-colors"
                                                     >
-                                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted shrink-0">
+                                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f5f5f5] shrink-0">
                                                             <Play className="h-3 w-3" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
@@ -165,9 +132,9 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
 
                     {/* Sidebar */}
                     <div className="lg:col-span-1">
-                        <Card className="sticky top-24">
+                        <Card className="sticky top-24 shadow-premium-lg border-0 bg-white">
                             {/* Thumbnail */}
-                            <div className="aspect-video bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center rounded-t-lg">
+                            <div className="aspect-video bg-gradient-to-br from-[#f5f5f5] to-[#e5e5e5] flex items-center justify-center rounded-t-lg">
                                 {course.thumbnail_url ? (
                                     <img
                                         src={course.thumbnail_url}
@@ -175,7 +142,7 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
                                         className="w-full h-full object-cover rounded-t-lg"
                                     />
                                 ) : (
-                                    <BookOpen className="h-16 w-16 text-primary/30" />
+                                    <BookOpen className="h-16 w-16 text-[#a3a3a3]" />
                                 )}
                             </div>
                             <CardContent className="p-6">
