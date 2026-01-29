@@ -675,7 +675,7 @@ export default function EditCoursePage() {
 
                                                         {lesson.type === 'reading' && (
                                                             <Textarea
-                                                                placeholder="Enter reading content (HTML supported)..."
+                                                                placeholder="Write in Markdown... (## Heading, **bold**, - bullet)"
                                                                 rows={6}
                                                                 value={lesson.content || ''}
                                                                 onChange={(e) => {
