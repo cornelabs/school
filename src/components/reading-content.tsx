@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import { Components } from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface ReadingContentProps {
     lesson: {
@@ -197,7 +198,7 @@ export function ReadingContent({ lesson, isCompleted, onComplete }: ReadingConte
             <div className="max-w-2xl mx-auto px-4 md:px-6 py-10 md:py-14">
                 {/* Reading Content with Markdown */}
                 <article>
-                    <ReactMarkdown components={markdownComponents}>
+                    <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
                         {lesson.content}
                     </ReactMarkdown>
                 </article>

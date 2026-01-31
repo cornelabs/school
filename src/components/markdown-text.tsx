@@ -2,6 +2,7 @@
 
 import ReactMarkdown from "react-markdown";
 import { Components } from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface MarkdownTextProps {
     content: string;
@@ -133,7 +134,7 @@ const markdownComponents: Components = {
 export function MarkdownText({ content, className = "" }: MarkdownTextProps) {
     return (
         <div className={className}>
-            <ReactMarkdown components={markdownComponents}>
+            <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
                 {content}
             </ReactMarkdown>
         </div>
