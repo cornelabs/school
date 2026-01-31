@@ -16,6 +16,7 @@ import { VideoPlayer } from "@/components/video-player";
 import { ReadingContent } from "@/components/reading-content";
 import { YouTubePlayer } from "@/components/youtube-player";
 import { LessonSidebar } from "@/components/lesson-sidebar";
+import { MarkdownText } from "@/components/markdown-text";
 
 interface LearnPageProps {
     params: Promise<{ courseId: string }>;
@@ -99,6 +100,47 @@ export default async function LearnPage({ params, searchParams }: LearnPageProps
                     </Badge>
                 </header>
 
+                {/* For reading lessons: show title at the top */}
+                {currentLesson.type === 'reading' && (
+                    <div className="max-w-2xl mx-auto px-4 md:px-6 pt-8 pb-4">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                            <div>
+                                <h1 className="text-xl font-semibold mb-1">{currentLesson.title}</h1>
+                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                    <span className="flex items-center gap-1">
+                                        <Clock className="h-3 w-3" />
+                                        {currentLesson.duration_seconds
+                                            ? `${Math.floor(currentLesson.duration_seconds / 60)}:${(currentLesson.duration_seconds % 60).toString().padStart(2, '0')}`
+                                            : 'Duration TBD'
+                                        }
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <BookOpen className="h-3 w-3" />
+                                        {currentModule?.title}
+                                    </span>
+                                </div>
+                            </div>
+                            {isLessonCompleted && (
+                                <Badge className="rounded-full px-2 py-0.5 text-[10px] bg-emerald-500/10 text-emerald-500 border-0 shrink-0">
+                                    <Check className="mr-1 h-3 w-3" />
+                                    Completed
+                                </Badge>
+                            )}
+                        </div>
+
+                        {currentLesson.description && (
+                            <>
+                                <Separator className="my-4 border-border/50" />
+                                <div className="space-y-2">
+                                    <h3 className="text-sm font-semibold">About this lesson</h3>
+                                    <MarkdownText content={currentLesson.description} />
+                                </div>
+                            </>
+                        )}
+                        <Separator className="mt-6 border-border/50" />
+                    </div>
+                )}
+
                 {/* Lesson Content - switches based on lesson type */}
                 {currentLesson.type === 'reading' ? (
                     <ReadingContent
@@ -117,46 +159,50 @@ export default async function LearnPage({ params, searchParams }: LearnPageProps
                     />
                 )}
 
-                {/* Lesson Info */}
-                <div className="max-w-4xl mx-auto px-4 md:px-6 py-6">
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
-                        <div>
-                            <h1 className="text-lg font-semibold mb-1">{currentLesson.title}</h1>
-                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                    <Clock className="h-3 w-3" />
-                                    {currentLesson.duration_seconds
-                                        ? `${Math.floor(currentLesson.duration_seconds / 60)}:${(currentLesson.duration_seconds % 60).toString().padStart(2, '0')}`
-                                        : 'Duration TBD'
-                                    }
-                                </span>
-                                <span className="flex items-center gap-1">
-                                    <BookOpen className="h-3 w-3" />
-                                    {currentModule?.title}
-                                </span>
+                {/* Lesson Info - only for non-reading lessons */}
+                {currentLesson.type !== 'reading' && (
+                    <div className="max-w-4xl mx-auto px-4 md:px-6 py-6">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+                            <div>
+                                <h1 className="text-lg font-semibold mb-1">{currentLesson.title}</h1>
+                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                    <span className="flex items-center gap-1">
+                                        <Clock className="h-3 w-3" />
+                                        {currentLesson.duration_seconds
+                                            ? `${Math.floor(currentLesson.duration_seconds / 60)}:${(currentLesson.duration_seconds % 60).toString().padStart(2, '0')}`
+                                            : 'Duration TBD'
+                                        }
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <BookOpen className="h-3 w-3" />
+                                        {currentModule?.title}
+                                    </span>
+                                </div>
                             </div>
+                            {isLessonCompleted && (
+                                <Badge className="rounded-full px-2 py-0.5 text-[10px] bg-emerald-500/10 text-emerald-500 border-0 shrink-0">
+                                    <Check className="mr-1 h-3 w-3" />
+                                    Completed
+                                </Badge>
+                            )}
                         </div>
-                        {isLessonCompleted && (
-                            <Badge className="rounded-full px-2 py-0.5 text-[10px] bg-emerald-500/10 text-emerald-500 border-0 shrink-0">
-                                <Check className="mr-1 h-3 w-3" />
-                                Completed
-                            </Badge>
+
+                        {currentLesson.description && (
+                            <>
+                                <Separator className="my-6 border-border/50" />
+                                <div className="space-y-2">
+                                    <h3 className="text-sm font-semibold">About this lesson</h3>
+                                    <MarkdownText content={currentLesson.description} />
+                                </div>
+                            </>
                         )}
                     </div>
+                )}
 
-                    {currentLesson.description && (
-                        <>
-                            <Separator className="my-6 border-border/50" />
-                            <div className="space-y-2">
-                                <h3 className="text-sm font-semibold">About this lesson</h3>
-                                <p className="text-xs text-muted-foreground">{currentLesson.description}</p>
-                            </div>
-                        </>
-                    )}
+                {/* Navigation - for all lesson types */}
+                <div className="max-w-4xl mx-auto px-4 md:px-6 py-6">
+                    <Separator className="mb-6 border-border/50" />
 
-                    <Separator className="my-6 border-border/50" />
-
-                    {/* Navigation */}
                     <div className="flex items-center justify-between gap-4">
                         {prevLesson ? (
                             <Button variant="outline" className="h-9 px-4 text-xs rounded-full" asChild>
