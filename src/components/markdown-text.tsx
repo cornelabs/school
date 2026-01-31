@@ -100,6 +100,34 @@ const markdownComponents: Components = {
             {children}
         </a>
     ),
+
+    // Tables
+    table: ({ children }) => (
+        <div className="my-3 overflow-x-auto">
+            <table className="w-full border-collapse text-xs">
+                {children}
+            </table>
+        </div>
+    ),
+    thead: ({ children }) => (
+        <thead className="bg-muted">{children}</thead>
+    ),
+    tbody: ({ children }) => (
+        <tbody>{children}</tbody>
+    ),
+    tr: ({ children }) => (
+        <tr className="border-b border-border">{children}</tr>
+    ),
+    th: ({ children }) => (
+        <th className="border border-border px-3 py-2 text-left font-semibold text-foreground text-xs">
+            {children}
+        </th>
+    ),
+    td: ({ children }) => (
+        <td className="border border-border px-3 py-2 text-muted-foreground text-xs">
+            {children}
+        </td>
+    ),
 };
 
 export function MarkdownText({ content, className = "" }: MarkdownTextProps) {
