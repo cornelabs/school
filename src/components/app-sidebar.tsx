@@ -10,6 +10,7 @@ import {
     LayoutDashboard,
     LogOut,
     Settings,
+    Shield,
     User,
 } from "lucide-react";
 
@@ -176,9 +177,23 @@ export function AppSidebar({ user }: AppSidebarProps) {
                                     </div>
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <User className="mr-2 h-4 w-4" />
-                                    Profile
+                                <DropdownMenuItem onClick={async () => {
+                                    const supabase = createClient();
+                                    const { data: profile } = await supabase
+                                        .from('profiles')
+                                        .select('role')
+                                        .eq('id', user?.id)
+                                        .single();
+
+                                    if (profile?.role === 'admin') {
+                                        toast.success("Access granted");
+                                        router.push('/admin');
+                                    } else {
+                                        toast.error("Access denied");
+                                    }
+                                }}>
+                                    <Shield className="mr-2 h-4 w-4" />
+                                    Admin Portal
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
                                     <Settings className="mr-2 h-4 w-4" />
