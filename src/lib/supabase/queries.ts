@@ -474,6 +474,42 @@ export async function getAllStudents() {
     })) || [];
 }
 
+export async function getAllProfiles() {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from('profiles')
+        .select(`
+      *,
+      enrollments:enrollments(count)
+    `)
+        .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return data?.map(profile => ({
+        ...profile,
+        enrolled_count: profile.enrollments?.[0]?.count || 0,
+    })) || [];
+}
+
+export async function updateUserRole(userId: string, role: 'admin' | 'student') {
+    const supabase = await createClient();
+    const currentUser = await getCurrentUser();
+
+    if (currentUser?.role !== 'admin') {
+        throw new Error('Unauthorized');
+    }
+
+    const { error } = await supabase
+        .from('profiles')
+        .update({ role })
+        .eq('id', userId);
+
+    if (error) throw error;
+}
+
+
 // =============================================
 // FILE UPLOAD
 // =============================================
