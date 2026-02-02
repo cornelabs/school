@@ -28,6 +28,8 @@ import {
     Check,
     BookOpen,
     Youtube,
+    ChevronUp,
+    ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -376,6 +378,39 @@ export default function EditCoursePage() {
         ));
     };
 
+    const moveModuleUp = (index: number) => {
+        if (index === 0) return;
+        const newModules = [...modules];
+        [newModules[index - 1], newModules[index]] = [newModules[index], newModules[index - 1]];
+        setModules(newModules);
+    };
+
+    const moveModuleDown = (index: number) => {
+        if (index === modules.length - 1) return;
+        const newModules = [...modules];
+        [newModules[index], newModules[index + 1]] = [newModules[index + 1], newModules[index]];
+        setModules(newModules);
+    };
+
+    const moveLessonUp = (moduleIndex: number, lessonIndex: number) => {
+        if (lessonIndex === 0) return;
+        const newModules = [...modules];
+        const lessons = [...newModules[moduleIndex].lessons];
+        [lessons[lessonIndex - 1], lessons[lessonIndex]] = [lessons[lessonIndex], lessons[lessonIndex - 1]];
+        newModules[moduleIndex] = { ...newModules[moduleIndex], lessons };
+        setModules(newModules);
+    };
+
+    const moveLessonDown = (moduleIndex: number, lessonIndex: number) => {
+        const lessons = modules[moduleIndex].lessons;
+        if (lessonIndex === lessons.length - 1) return;
+        const newModules = [...modules];
+        const newLessons = [...lessons];
+        [newLessons[lessonIndex], newLessons[lessonIndex + 1]] = [newLessons[lessonIndex + 1], newLessons[lessonIndex]];
+        newModules[moduleIndex] = { ...newModules[moduleIndex], lessons: newLessons };
+        setModules(newModules);
+    };
+
     if (isLoading || !course) {
         return (
             <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
@@ -489,6 +524,28 @@ export default function EditCoursePage() {
                                 {modules.map((module, moduleIndex) => (
                                     <div key={module.id} className="border rounded-lg p-4 space-y-4">
                                         <div className="flex items-center gap-3">
+                                            <div className="flex flex-col gap-1">
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6"
+                                                    onClick={() => moveModuleUp(moduleIndex)}
+                                                    disabled={moduleIndex === 0}
+                                                >
+                                                    <ChevronUp className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6"
+                                                    onClick={() => moveModuleDown(moduleIndex)}
+                                                    disabled={moduleIndex === modules.length - 1}
+                                                >
+                                                    <ChevronDown className="h-4 w-4" />
+                                                </Button>
+                                            </div>
                                             <GripVertical className="h-5 w-5 text-muted-foreground" />
                                             <Input
                                                 placeholder="Module title"
