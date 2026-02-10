@@ -42,23 +42,13 @@ function LoginForm() {
             return;
         }
 
-        // Check for admin promotion
-        await checkAndPromoteAdmin();
-
-        // Check user role and redirect accordingly
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', data.user.id)
-            .single();
+        // Check for admin promotion (fire and forget)
+        checkAndPromoteAdmin();
 
         toast.success("Welcome back!");
 
-        if (profile?.role === 'admin') {
-            window.location.href = '/admin';
-        } else {
-            window.location.href = redirectTo;
-        }
+        // Reload page to let middleware handle the redirect based on auth state
+        window.location.reload();
     };
 
     return (

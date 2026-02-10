@@ -58,8 +58,8 @@ export default function SignupPage() {
             return;
         }
 
-        // Check for admin promotion
-        await checkAndPromoteAdmin();
+        // Check for admin promotion (fire and forget)
+        checkAndPromoteAdmin();
 
         toast.success("Account created! Please check your email to verify.");
         window.location.href = "/login";
