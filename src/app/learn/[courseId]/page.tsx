@@ -17,6 +17,8 @@ import { ReadingContent } from "@/components/reading-content";
 import { YouTubePlayer } from "@/components/youtube-player";
 import { LessonSidebar } from "@/components/lesson-sidebar";
 import { MarkdownText } from "@/components/markdown-text";
+import { QuizPlayer } from "@/components/quiz-player";
+import { AssignmentPlayer } from "@/components/assignment-player";
 
 interface LearnPageProps {
     params: Promise<{ courseId: string }>;
@@ -149,6 +151,16 @@ export default async function LearnPage({ params, searchParams }: LearnPageProps
                     />
                 ) : currentLesson.type === 'youtube' ? (
                     <YouTubePlayer
+                        lesson={currentLesson}
+                        isCompleted={isLessonCompleted}
+                    />
+                ) : currentLesson.type === 'quiz' ? (
+                    <QuizPlayer
+                        lesson={currentLesson}
+                        isCompleted={isLessonCompleted}
+                    />
+                ) : currentLesson.type === 'assignment' ? (
+                    <AssignmentPlayer
                         lesson={currentLesson}
                         isCompleted={isLessonCompleted}
                     />

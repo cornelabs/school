@@ -4,7 +4,7 @@ export type UserRole = 'student' | 'admin';
 export type CourseStatus = 'draft' | 'published';
 export type CourseDifficulty = 'beginner' | 'intermediate' | 'advanced';
 export type EnrollmentStatus = 'active' | 'completed' | 'dropped';
-export type LessonType = 'video' | 'quiz' | 'reading' | 'youtube';
+export type LessonType = 'video' | 'quiz' | 'reading' | 'youtube' | 'assignment';
 
 export interface User {
   id: string;
@@ -47,6 +47,18 @@ export interface Lesson {
   duration_seconds: number;
   order_index: number;
   type: LessonType;
+  quiz_data?: {
+    questions: {
+      id: string;
+      question: string;
+      options: string[];
+      correct_index: number;
+    }[];
+    passing_score: number;
+  };
+  assignment_data?: {
+    prompt: string;
+  };
 }
 
 export interface Enrollment {
@@ -64,6 +76,9 @@ export interface Progress {
   completed: boolean;
   watch_time_seconds: number;
   last_watched_at: string;
+  quiz_answers?: number[]; // Array of selected indices
+  assignment_submission?: string;
+  score?: number;
 }
 
 export interface Quiz {

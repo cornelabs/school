@@ -30,6 +30,8 @@ import {
     Youtube,
     ChevronUp,
     ChevronDown,
+    FileText,
+    HelpCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -42,7 +44,19 @@ interface LessonData {
     video_url: string | null;
     youtube_url: string | null;
     content: string | null;
-    type: 'video' | 'reading' | 'youtube';
+    type: 'video' | 'reading' | 'youtube' | 'quiz' | 'assignment';
+    quiz_data?: {
+        questions: {
+            id: string;
+            question: string;
+            options: string[];
+            correct_index: number;
+        }[];
+        passing_score: number;
+    };
+    assignment_data?: {
+        prompt: string;
+    };
     videoFile: File | null;
     order_index: number;
     isNew?: boolean;
@@ -137,6 +151,8 @@ export default function EditCoursePage() {
                             type: l.type || 'video',
                             youtube_url: l.youtube_url || null,
                             content: l.content || null,
+                            quiz_data: l.quiz_data || { questions: [], passing_score: 70 },
+                            assignment_data: l.assignment_data || { prompt: '' },
                         }))
                 })));
             }
@@ -259,6 +275,8 @@ export default function EditCoursePage() {
                             content: lesson.content,
                             order_index: li,
                             type: lesson.type || 'video',
+                            quiz_data: lesson.type === 'quiz' ? lesson.quiz_data : undefined,
+                            assignment_data: lesson.type === 'assignment' ? lesson.assignment_data : undefined,
                         })
                             .select()
                             .single();
@@ -281,6 +299,8 @@ export default function EditCoursePage() {
                                 youtube_url: lesson.youtube_url,
                                 content: lesson.content,
                                 type: lesson.type || 'video',
+                                quiz_data: lesson.type === 'quiz' ? lesson.quiz_data : undefined,
+                                assignment_data: lesson.type === 'assignment' ? lesson.assignment_data : undefined,
                                 order_index: li,
                             })
                             .eq('id', lesson.id);
@@ -341,6 +361,8 @@ export default function EditCoursePage() {
                         youtube_url: null,
                         content: null,
                         type: 'video' as const,
+                        quiz_data: { questions: [], passing_score: 70 },
+                        assignment_data: { prompt: '' },
                         videoFile: null,
                         order_index: m.lessons.length,
                         isNew: true,
@@ -655,6 +677,46 @@ export default function EditCoursePage() {
                                                                 <BookOpen className="h-4 w-4 mr-1" />
                                                                 Reading
                                                             </Button>
+                                                            <Button
+                                                                type="button"
+                                                                variant={lesson.type === 'quiz' ? 'default' : 'outline'}
+                                                                size="sm"
+                                                                onClick={() => {
+                                                                    setModules(modules.map(m =>
+                                                                        m.id === module.id
+                                                                            ? {
+                                                                                ...m,
+                                                                                lessons: m.lessons.map(l =>
+                                                                                    l.id === lesson.id ? { ...l, type: 'quiz' as const } : l
+                                                                                )
+                                                                            }
+                                                                            : m
+                                                                    ));
+                                                                }}
+                                                            >
+                                                                <HelpCircle className="h-4 w-4 mr-1" />
+                                                                Quiz
+                                                            </Button>
+                                                            <Button
+                                                                type="button"
+                                                                variant={lesson.type === 'assignment' ? 'default' : 'outline'}
+                                                                size="sm"
+                                                                onClick={() => {
+                                                                    setModules(modules.map(m =>
+                                                                        m.id === module.id
+                                                                            ? {
+                                                                                ...m,
+                                                                                lessons: m.lessons.map(l =>
+                                                                                    l.id === lesson.id ? { ...l, type: 'assignment' as const } : l
+                                                                                )
+                                                                            }
+                                                                            : m
+                                                                    ));
+                                                                }}
+                                                            >
+                                                                <FileText className="h-4 w-4 mr-1" />
+                                                                Assignment
+                                                            </Button>
                                                         </div>
 
                                                         {/* Conditional Content Fields */}
@@ -754,6 +816,154 @@ export default function EditCoursePage() {
                                                                     ));
                                                                 }}
                                                             />
+                                                        )}
+
+                                                        { /* ... existing assignment code ... */}
+
+                                                        {lesson.type === 'quiz' && (
+                                                            <div className="space-y-4 border rounded-md p-4 bg-background">
+                                                                <div className="flex items-center justify-between">
+                                                                    <Label>Quiz Questions</Label>
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="outline"
+                                                                        size="sm"
+                                                                        onClick={() => {
+                                                                            const currentQuestions = lesson.quiz_data?.questions || [];
+                                                                            const newQuestion = {
+                                                                                id: `q-${Date.now()}`,
+                                                                                question: '',
+                                                                                options: ['', '', '', ''],
+                                                                                correct_index: 0
+                                                                            };
+
+                                                                            setModules(modules.map(m =>
+                                                                                m.id === module.id ? {
+                                                                                    ...m,
+                                                                                    lessons: m.lessons.map(l =>
+                                                                                        l.id === lesson.id ? {
+                                                                                            ...l,
+                                                                                            quiz_data: {
+                                                                                                passing_score: l.quiz_data?.passing_score || 70,
+                                                                                                questions: [...currentQuestions, newQuestion]
+                                                                                            }
+                                                                                        } : l
+                                                                                    )
+                                                                                } : m
+                                                                            ));
+                                                                        }}
+                                                                    >
+                                                                        <Plus className="h-3 w-3 mr-1" />
+                                                                        Add Question
+                                                                    </Button>
+                                                                </div>
+
+                                                                {(lesson.quiz_data?.questions || []).map((q, qIndex) => (
+                                                                    <div key={q.id} className="space-y-3 p-3 border rounded-md relative">
+                                                                        <Button
+                                                                            type="button"
+                                                                            variant="ghost"
+                                                                            size="icon"
+                                                                            className="absolute top-2 right-2 h-6 w-6 text-destructive"
+                                                                            onClick={() => {
+                                                                                const newQuestions = [...(lesson.quiz_data?.questions || [])];
+                                                                                newQuestions.splice(qIndex, 1);
+
+                                                                                setModules(modules.map(m =>
+                                                                                    m.id === module.id ? {
+                                                                                        ...m,
+                                                                                        lessons: m.lessons.map(l =>
+                                                                                            l.id === lesson.id ? {
+                                                                                                ...l,
+                                                                                                quiz_data: {
+                                                                                                    ...l.quiz_data!,
+                                                                                                    questions: newQuestions
+                                                                                                }
+                                                                                            } : l
+                                                                                        )
+                                                                                    } : m
+                                                                                ));
+                                                                            }}
+                                                                        >
+                                                                            <Trash2 className="h-3 w-3" />
+                                                                        </Button>
+
+                                                                        <div className="space-y-1">
+                                                                            <Label className="text-xs">Question {qIndex + 1}</Label>
+                                                                            <Input
+                                                                                value={q.question}
+                                                                                placeholder="Enter question text"
+                                                                                onChange={(e) => {
+                                                                                    const newQuestions = [...(lesson.quiz_data?.questions || [])];
+                                                                                    newQuestions[qIndex] = { ...q, question: e.target.value };
+
+                                                                                    setModules(modules.map(m =>
+                                                                                        m.id === module.id ? {
+                                                                                            ...m,
+                                                                                            lessons: m.lessons.map(l =>
+                                                                                                l.id === lesson.id ? {
+                                                                                                    ...l,
+                                                                                                    quiz_data: { ...l.quiz_data!, questions: newQuestions }
+                                                                                                } : l
+                                                                                            )
+                                                                                        } : m
+                                                                                    ));
+                                                                                }}
+                                                                            />
+                                                                        </div>
+
+                                                                        <div className="space-y-2">
+                                                                            <Label className="text-xs">Options</Label>
+                                                                            {q.options.map((opt, optIndex) => (
+                                                                                <div key={optIndex} className="flex items-center gap-2">
+                                                                                    <div
+                                                                                        className={`h-4 w-4 rounded-full border cursor-pointer ${q.correct_index === optIndex ? 'bg-primary border-primary' : 'border-muted-foreground'}`}
+                                                                                        onClick={() => {
+                                                                                            const newQuestions = [...(lesson.quiz_data?.questions || [])];
+                                                                                            newQuestions[qIndex] = { ...q, correct_index: optIndex };
+
+                                                                                            setModules(modules.map(m =>
+                                                                                                m.id === module.id ? {
+                                                                                                    ...m,
+                                                                                                    lessons: m.lessons.map(l =>
+                                                                                                        l.id === lesson.id ? {
+                                                                                                            ...l,
+                                                                                                            quiz_data: { ...l.quiz_data!, questions: newQuestions }
+                                                                                                        } : l
+                                                                                                    )
+                                                                                                } : m
+                                                                                            ));
+                                                                                        }}
+                                                                                    />
+                                                                                    <Input
+                                                                                        value={opt}
+                                                                                        placeholder={`Option ${optIndex + 1}`}
+                                                                                        className="h-8 text-sm"
+                                                                                        onChange={(e) => {
+                                                                                            const newQuestions = [...(lesson.quiz_data?.questions || [])];
+                                                                                            const newOptions = [...q.options];
+                                                                                            newOptions[optIndex] = e.target.value;
+                                                                                            newQuestions[qIndex] = { ...q, options: newOptions };
+
+                                                                                            setModules(modules.map(m =>
+                                                                                                m.id === module.id ? {
+                                                                                                    ...m,
+                                                                                                    lessons: m.lessons.map(l =>
+                                                                                                        l.id === lesson.id ? {
+                                                                                                            ...l,
+                                                                                                            quiz_data: { ...l.quiz_data!, questions: newQuestions }
+                                                                                                        } : l
+                                                                                                    )
+                                                                                                } : m
+                                                                                            ));
+                                                                                        }}
+                                                                                    />
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
                                                         )}
 
                                                         <Textarea
