@@ -75,6 +75,19 @@ export async function adminInviteUser(courseId: string, email: string, fullName:
         if (existingProfile) {
             userId = existingProfile.id;
             isNewUser = false;
+
+            // Generate Magic Link for existing users so they don't have to log in
+            const { data: linkData } = await supabaseAdmin.auth.admin.generateLink({
+                type: 'magiclink',
+                email: email,
+                options: {
+                    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/learn/${courseId}`
+                }
+            });
+
+            if (linkData?.properties?.action_link) {
+                actionLink = linkData.properties.action_link;
+            }
         } else {
             // This is weird state (auth user exists but profile doesnt?), but assume existing.
             return { error: "User exists but profile not found. Contact support." };
