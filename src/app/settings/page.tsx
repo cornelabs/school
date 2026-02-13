@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,11 +8,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
 
 export default function SettingsPage() {
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isUpdating, setIsUpdating] = useState(false);
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        const checkSession = async () => {
+            const supabase = createClient();
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (session) {
+                setUser(session.user);
+            }
+            setIsLoading(false);
+        };
+        checkSession();
+    }, []);
 
     const handleUpdatePassword = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,7 +43,7 @@ export default function SettingsPage() {
             return;
         }
 
-        setIsLoading(true);
+        setIsUpdating(true);
         const supabase = createClient();
 
         try {
@@ -41,15 +57,44 @@ export default function SettingsPage() {
             setPassword("");
             setConfirmPassword("");
         } catch (error: any) {
-            console.error(error);
+            console.error("Update password error:", error);
             toast.error(error.message || "Failed to update password");
         } finally {
-            setIsLoading(false);
+            setIsUpdating(false);
         }
     };
 
+    if (isLoading) {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+        );
+    }
+
+    if (!user) {
+        return (
+            <div className="min-h-screen flex items-center justify-center p-4">
+                <Card className="w-full max-w-md text-center">
+                    <CardHeader>
+                        <CardTitle>Session Missing</CardTitle>
+                        <CardDescription>
+                            You must be logged in to access this page.
+                            If you came from an invite email, the link might have expired or you might be using a different browser.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Button asChild className="w-full">
+                            <Link href="/login">Sign In</Link>
+                        </Button>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    }
+
     return (
-        <div className="container max-w-2xl py-10">
+        <div className="container max-w-2xl py-10 px-4 mx-auto">
             <h1 className="text-3xl font-bold mb-8">Account Settings</h1>
 
             <Card>
@@ -83,9 +128,9 @@ export default function SettingsPage() {
                                 required
                             />
                         </div>
-                        <div className="flex justify-end">
-                            <Button type="submit" disabled={isLoading}>
-                                {isLoading ? (
+                        <div className="flex justify-end pt-2">
+                            <Button type="submit" disabled={isUpdating} className="w-full sm:w-auto">
+                                {isUpdating ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                         Updating...
