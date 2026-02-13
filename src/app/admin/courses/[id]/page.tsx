@@ -17,6 +17,15 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import {
     ArrowLeft,
     Upload,
     Loader2,
@@ -32,6 +41,9 @@ import {
     ChevronDown,
     FileText,
     HelpCircle,
+    Lock,
+    Unlock,
+    UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -78,6 +90,7 @@ interface CourseData {
     category: string;
     thumbnail_url: string | null;
     status: string;
+    published_at?: string;
 }
 
 export default function EditCoursePage() {
@@ -163,7 +176,7 @@ export default function EditCoursePage() {
         loadCourse();
     }, [courseId, router]);
 
-    const handleSave = async (publish = false) => {
+    const handleSave = async (newStatus?: string) => {
         if (!course) return;
 
         setIsSaving(true);
@@ -191,6 +204,9 @@ export default function EditCoursePage() {
             }
 
             // Update course
+            const statusToSave = newStatus || course.status;
+            const publishedAt = newStatus === 'published' ? new Date().toISOString() : course.published_at;
+
             const { error: courseError } = await supabase
                 .from('courses')
                 .update({
@@ -199,8 +215,8 @@ export default function EditCoursePage() {
                     difficulty: course.difficulty,
                     category: course.category,
                     thumbnail_url: thumbnailUrl,
-                    status: publish ? 'published' : course.status,
-                    published_at: publish ? new Date().toISOString() : undefined,
+                    status: statusToSave,
+                    published_at: publishedAt,
                     updated_at: new Date().toISOString(),
                 })
                 .eq('id', courseId);
@@ -315,7 +331,7 @@ export default function EditCoursePage() {
                 }
             }
 
-            toast.success(publish ? 'Course published!' : 'Course saved!');
+            toast.success(newStatus === 'published' ? 'Course published!' : 'Course saved!');
             router.refresh();
         } catch (error: any) {
             toast.error(error.message || 'Failed to save course');
@@ -1099,7 +1115,7 @@ export default function EditCoursePage() {
                                 <Button
                                     className="w-full"
                                     disabled={isSaving}
-                                    onClick={() => handleSave(false)}
+                                    onClick={() => handleSave()}
                                 >
                                     {isSaving ? (
                                         <>
@@ -1113,19 +1129,50 @@ export default function EditCoursePage() {
                                         </>
                                     )}
                                 </Button>
-                                {course.status !== 'published' && (
+
+                                {course.status === 'draft' && (
                                     <Button
                                         variant="outline"
                                         className="w-full"
                                         disabled={isSaving}
-                                        onClick={() => handleSave(true)}
+                                        onClick={() => handleSave('published')}
                                     >
-                                        Publish Now
+                                        Publish Course
                                     </Button>
                                 )}
+
+                                {course.status === 'published' && (
+                                    <Button
+                                        variant="outline"
+                                        className="w-full text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                        disabled={isSaving}
+                                        onClick={() => handleSave('locked')}
+                                    >
+                                        <Lock className="mr-2 h-4 w-4" />
+                                        Lock (Close Enrollment)
+                                    </Button>
+                                )}
+
+                                {course.status === 'locked' && (
+                                    <Button
+                                        variant="outline"
+                                        className="w-full text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                        disabled={isSaving}
+                                        onClick={() => handleSave('published')}
+                                    >
+                                        <Unlock className="mr-2 h-4 w-4" />
+                                        Unlock (Open Enrollment)
+                                    </Button>
+                                )}
+
+                                <Separator className="my-2" />
+
+                                <RegisterUserDialog courseId={courseId} courseTitle={course.title} />
+
                                 <Button variant="ghost" className="w-full" asChild>
-                                    <Link href={`/courses/${courseId}`}>
-                                        Preview Course
+                                    <Link href="/admin/courses">
+                                        <ArrowLeft className="mr-2 h-4 w-4" />
+                                        Back to Courses
                                     </Link>
                                 </Button>
                             </CardContent>
@@ -1134,5 +1181,94 @@ export default function EditCoursePage() {
                 </div>
             </main>
         </div>
+    );
+}
+
+function RegisterUserDialog({ courseId, courseTitle }: { courseId: string, courseTitle: string }) {
+    const [open, setOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [email, setEmail] = useState("");
+    const [fullName, setFullName] = useState("");
+
+    const handleRegister = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        try {
+            const { adminInviteUser } = await import("@/app/actions/admin-invite");
+            const result = await adminInviteUser(courseId, email, fullName);
+
+            if (result.error) {
+                toast.error(result.error);
+            } else {
+                toast.success(result.message || "User registered successfully!");
+                setOpen(false);
+                setEmail("");
+                setFullName("");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to register user");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button variant="secondary" className="w-full">
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Register Student
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Register Student</DialogTitle>
+                    <DialogDescription>
+                        Create an account for a student and enroll them in <strong>{courseTitle}</strong>.
+                        They will receive an email to set their password.
+                    </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleRegister} className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="email">Email Address</Label>
+                        <Input
+                            id="email"
+                            type="email"
+                            placeholder="student@example.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="fullName">Full Name</Label>
+                        <Input
+                            id="fullName"
+                            placeholder="John Doe"
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="flex justify-end gap-2 pt-2">
+                        <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
+                            Cancel
+                        </Button>
+                        <Button type="submit" disabled={isLoading}>
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Registering...
+                                </>
+                            ) : (
+                                "Register & Send Invite"
+                            )}
+                        </Button>
+                    </div>
+                </form>
+            </DialogContent>
+        </Dialog>
     );
 }

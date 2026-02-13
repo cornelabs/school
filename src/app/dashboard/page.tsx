@@ -131,7 +131,15 @@ export default async function DashboardPage() {
                                 {enrollmentsWithProgress.map((enrollment) => (
                                     <div key={enrollment.id} className="rounded-xl border border-border/50 bg-card p-5 hover:border-border transition-colors">
                                         <div className="flex gap-4">
-                                            <div className="h-20 w-28 rounded-lg bg-muted/50 flex items-center justify-center shrink-0 overflow-hidden">
+                                            <div className="h-20 w-28 rounded-lg bg-muted/50 flex items-center justify-center shrink-0 overflow-hidden relative">
+                                                {/* Premium Badge */}
+                                                {enrollment.course?.status !== 'locked' && (
+                                                    <div className="absolute top-1 right-1 z-10">
+                                                        <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 text-[8px] px-1.5 py-0 h-4">
+                                                            Premium
+                                                        </Badge>
+                                                    </div>
+                                                )}
                                                 {enrollment.course?.thumbnail_url ? (
                                                     <img
                                                         src={enrollment.course.thumbnail_url}

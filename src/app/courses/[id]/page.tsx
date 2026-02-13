@@ -142,7 +142,7 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
                                             </Link>
                                         </Button>
                                     ) : user ? (
-                                        <EnrollButton courseId={course.id} />
+                                        <EnrollButton courseId={course.id} isLocked={course.status === 'locked'} />
                                     ) : (
                                         <Button className="w-full h-9 text-sm rounded-full" asChild>
                                             <Link href={`/login?redirect=/courses/${course.id}`}>

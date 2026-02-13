@@ -195,9 +195,11 @@ export function AppSidebar({ user }: AppSidebarProps) {
                                     <Shield className="mr-2 h-4 w-4" />
                                     Admin Portal
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <Settings className="mr-2 h-4 w-4" />
-                                    Settings
+                                <DropdownMenuItem asChild>
+                                    <Link href="/settings" className="w-full cursor-pointer">
+                                        <Settings className="mr-2 h-4 w-4" />
+                                        Settings
+                                    </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={handleLogout}>

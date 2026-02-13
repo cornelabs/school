@@ -47,7 +47,7 @@ export async function getPublishedCourses() {
       modules:modules(count),
       lessons:modules(lessons(count))
     `)
-        .eq('status', 'published')
+        .in('status', ['published', 'locked'])
         .order('created_at', { ascending: false });
 
     if (error) throw error;

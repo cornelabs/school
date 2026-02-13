@@ -8,6 +8,7 @@ import {
     Clock,
     ArrowRight,
     Search,
+    Lock,
 } from "lucide-react";
 import { getPublishedCourses, getCurrentUser } from "@/lib/supabase/queries";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
@@ -80,7 +81,22 @@ export default async function CoursesPage() {
                                     className="rounded-xl border border-border/50 bg-card overflow-hidden hover:border-border transition-colors"
                                 >
                                     {/* Course Thumbnail */}
-                                    <div className="h-36 bg-muted/50 flex items-center justify-center">
+                                    <div className="h-36 bg-muted/50 flex items-center justify-center relative">
+                                        {course.status === 'locked' && (
+                                            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-10">
+                                                <div className="bg-background/80 px-3 py-1 rounded-full border shadow-sm flex items-center gap-2">
+                                                    <Lock className="h-4 w-4" />
+                                                    <span className="text-xs font-medium">Locked</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {course.status !== 'locked' && (
+                                            <div className="absolute top-3 right-3 z-10">
+                                                <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-sm text-[10px] px-2 py-0.5">
+                                                    Premium
+                                                </Badge>
+                                            </div>
+                                        )}
                                         {course.thumbnail_url ? (
                                             <img
                                                 src={course.thumbnail_url}

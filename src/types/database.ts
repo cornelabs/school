@@ -1,7 +1,7 @@
 // Database types for the LMS
 
 export type UserRole = 'student' | 'admin';
-export type CourseStatus = 'draft' | 'published';
+export type CourseStatus = 'draft' | 'published' | 'locked';
 export type CourseDifficulty = 'beginner' | 'intermediate' | 'advanced';
 export type EnrollmentStatus = 'active' | 'completed' | 'dropped';
 export type LessonType = 'video' | 'quiz' | 'reading' | 'youtube' | 'assignment';
