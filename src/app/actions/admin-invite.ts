@@ -111,6 +111,7 @@ export async function adminInviteUser(courseId: string, email: string, fullName:
                     isNewUser: isNewUser,
                     userEmail: email,
                     tempPassword: tempPassword,
+                    userName: fullName,
                 }),
             });
             console.log(`Invite email sent to ${email}`);

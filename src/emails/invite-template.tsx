@@ -18,6 +18,7 @@ interface InviteEmailProps {
     isNewUser: boolean;
     userEmail?: string;
     tempPassword?: string;
+    userName?: string;
 }
 
 export const InviteEmail = ({
@@ -26,6 +27,7 @@ export const InviteEmail = ({
     isNewUser,
     userEmail,
     tempPassword,
+    userName,
 }: InviteEmailProps) => {
     return (
         <Html>
@@ -38,7 +40,7 @@ export const InviteEmail = ({
                             <strong>{courseTitle}</strong> Access Granted
                         </Heading>
                         <Text className="text-black text-[14px] leading-[24px]">
-                            Hello,
+                            Hello {userName || "there"},
                         </Text>
                         <Text className="text-black text-[14px] leading-[24px]">
                             You have been registered for the course <strong>{courseTitle}</strong>.
