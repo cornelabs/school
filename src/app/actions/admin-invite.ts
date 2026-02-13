@@ -76,17 +76,15 @@ export async function adminInviteUser(courseId: string, email: string, fullName:
             userId = existingProfile.id;
             isNewUser = false;
 
-            // Generate Magic Link for existing users so they don't have to log in
+            // Generate Magic Link for existing users
             const { data: linkData } = await supabaseAdmin.auth.admin.generateLink({
                 type: 'magiclink',
                 email: email,
-                options: {
-                    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/learn/${courseId}`
-                }
             });
 
-            if (linkData?.properties?.action_link) {
-                actionLink = linkData.properties.action_link;
+            if (linkData?.properties?.hashed_token) {
+                const tokenHash = linkData.properties.hashed_token;
+                actionLink = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/confirm?token_hash=${tokenHash}&type=magiclink&next=/learn/${courseId}`;
             }
         } else {
             // This is weird state (auth user exists but profile doesnt?), but assume existing.
@@ -97,16 +95,14 @@ export async function adminInviteUser(courseId: string, email: string, fullName:
         isNewUser = true;
 
         // Generate Invite Link for new users
-        const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+        const { data: linkData } = await supabaseAdmin.auth.admin.generateLink({
             type: 'invite',
             email: email,
-            options: {
-                redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/settings`
-            }
         });
 
-        if (linkData && linkData.properties?.action_link) {
-            actionLink = linkData.properties.action_link;
+        if (linkData?.properties?.hashed_token) {
+            const tokenHash = linkData.properties.hashed_token;
+            actionLink = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/confirm?token_hash=${tokenHash}&type=invite&next=/settings`;
         }
 
         // Ensure profile exists (it should via triggers, but we can force update name)
