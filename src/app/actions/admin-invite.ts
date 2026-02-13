@@ -83,9 +83,9 @@ export async function adminInviteUser(courseId: string, email: string, fullName:
         userId = userData.user.id;
         isNewUser = true;
 
-        // Generate Password Reset Link for new users
+        // Generate Invite Link for new users
         const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-            type: 'recovery',
+            type: 'invite',
             email: email,
             options: {
                 redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/settings`
