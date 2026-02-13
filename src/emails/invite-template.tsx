@@ -16,12 +16,16 @@ interface InviteEmailProps {
     courseTitle: string;
     actionLink: string;
     isNewUser: boolean;
+    userEmail?: string;
+    tempPassword?: string;
 }
 
 export const InviteEmail = ({
     courseTitle,
     actionLink,
     isNewUser,
+    userEmail,
+    tempPassword,
 }: InviteEmailProps) => {
     return (
         <Html>
@@ -41,12 +45,25 @@ export const InviteEmail = ({
                         </Text>
 
                         {isNewUser ? (
-                            <Text className="text-black text-[14px] leading-[24px]">
-                                Your account has been created. Please click the button below to secure your account and set your password.
-                            </Text>
+                            <>
+                                <Text className="text-black text-[14px] leading-[24px]">
+                                    Your account has been created. You can log in using the credentials below:
+                                </Text>
+                                <Section className="bg-[#f4f4f4] rounded p-[15px] my-[15px]">
+                                    <Text className="text-black text-[14px] leading-[24px] m-0">
+                                        <strong>Email:</strong> {userEmail}
+                                    </Text>
+                                    <Text className="text-black text-[14px] leading-[24px] m-0">
+                                        <strong>Temporary Password:</strong> {tempPassword}
+                                    </Text>
+                                </Section>
+                                <Text className="text-black text-[14px] leading-[24px]">
+                                    Please log in and change your password in the <strong>Settings</strong> page immediately.
+                                </Text>
+                            </>
                         ) : (
                             <Text className="text-black text-[14px] leading-[24px]">
-                                You can now access the course materials from your dashboard.
+                                You can now access the course materials from your dashboard using your existing account.
                             </Text>
                         )}
 
@@ -55,11 +72,13 @@ export const InviteEmail = ({
                                 className="bg-[#000000] rounded text-white text-[12px] font-semibold no-underline text-center px-5 py-3"
                                 href={actionLink}
                             >
-                                {isNewUser ? "Set Password & detailed Login" : "Go to Course"}
+                                {isNewUser ? "Log In & Access Course" : "Go to Course"}
                             </Button>
                         </Section>
                         <Text className="text-black text-[14px] leading-[24px]">
                             Happy learning!
+                            <br />
+                            The Cornelabs Team
                         </Text>
                     </Container>
                 </Body>

@@ -8,13 +8,19 @@ import { createClient as createNextClient } from "@/lib/supabase/server";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// We use the supabase-js client directly for Admin operations because
-// the Next.js helper is bound to the request context (user session),
-// whereas inviteUser requires Service Role privileges to create users.
 const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+function generateTempPassword(length = 12) {
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let retVal = "";
+    for (let i = 0, n = charset.length; i < length; ++i) {
+        retVal += charset.charAt(Math.floor(Math.random() * n));
+    }
+    return retVal;
+}
 
 export async function adminInviteUser(courseId: string, email: string, fullName: string) {
     // 1. Verify Admin Permissions
@@ -43,29 +49,20 @@ export async function adminInviteUser(courseId: string, email: string, fullName:
     // 3. User Management
     let userId = "";
     let isNewUser = false;
-    let actionLink = `${process.env.NEXT_PUBLIC_SITE_URL}/learn/${courseId}`;
+    let tempPassword = "";
+    let actionLink = `${process.env.NEXT_PUBLIC_SITE_URL}/login`;
 
-    // Check if user exists
-    const { data: existingUsers, error: listUserError } = await supabaseAdmin.auth.admin.listUsers();
-    // Note: listUsers isn't efficient for large bases, but for now it's fine. 
-    // Ideally we'd use getUserById but we only have email.
-    // Actually, createClient with service role allow admin.getUserByEmail? No.
-    // We can try to get user by email directly via admin api? 
-    // No, but we can try to create and catch error, or just use listUsers filtering if supported?
-    // Let's use createUser and handle "User already registered" error.
-
-    // Better approach: Try to create user.
+    // Try to create user with a temporary password
+    tempPassword = generateTempPassword();
     const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email: email,
+        password: tempPassword,
         email_confirm: true,
         user_metadata: { full_name: fullName }
     });
 
     if (createError) {
-        // logic if user already exists
-        // Error message for existing user usually contains "User already registered"
-        // But let's check exact behavior or error code?
-        // Actually, we can just search profile table first.
+        // User probably exists
         const { data: existingProfile } = await supabaseAdmin
             .from('profiles')
             .select('id')
@@ -75,35 +72,14 @@ export async function adminInviteUser(courseId: string, email: string, fullName:
         if (existingProfile) {
             userId = existingProfile.id;
             isNewUser = false;
-
-            // Generate Magic Link for existing users
-            const { data: linkData } = await supabaseAdmin.auth.admin.generateLink({
-                type: 'magiclink',
-                email: email,
-            });
-
-            if (linkData?.properties?.hashed_token) {
-                const tokenHash = linkData.properties.hashed_token;
-                actionLink = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/confirm?token_hash=${tokenHash}&type=magiclink&next=/learn/${courseId}`;
-            }
+            actionLink = `${process.env.NEXT_PUBLIC_SITE_URL}/learn/${courseId}`;
+            tempPassword = ""; // Clear for existing users
         } else {
-            // This is weird state (auth user exists but profile doesnt?), but assume existing.
-            return { error: "User exists but profile not found. Contact support." };
+            return { error: "User exists in auth but profile not found. Contact support." };
         }
     } else {
         userId = userData.user.id;
         isNewUser = true;
-
-        // Generate Invite Link for new users
-        const { data: linkData } = await supabaseAdmin.auth.admin.generateLink({
-            type: 'invite',
-            email: email,
-        });
-
-        if (linkData?.properties?.hashed_token) {
-            const tokenHash = linkData.properties.hashed_token;
-            actionLink = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/confirm?token_hash=${tokenHash}&type=invite&next=/settings`;
-        }
 
         // Ensure profile exists (it should via triggers, but we can force update name)
         await supabaseAdmin
@@ -133,6 +109,8 @@ export async function adminInviteUser(courseId: string, email: string, fullName:
                     courseTitle: course.title,
                     actionLink: actionLink,
                     isNewUser: isNewUser,
+                    userEmail: email,
+                    tempPassword: tempPassword,
                 }),
             });
             console.log(`Invite email sent to ${email}`);
@@ -145,5 +123,10 @@ export async function adminInviteUser(courseId: string, email: string, fullName:
     // 6. Revalidate
     revalidatePath(`/admin/courses/${courseId}`);
 
-    return { success: true, message: isNewUser ? "User created and invited!" : "User enrolled successfully!" };
+    return {
+        success: true,
+        message: isNewUser
+            ? `User created with temporary password: ${tempPassword}`
+            : "User enrolled successfully!"
+    };
 }
