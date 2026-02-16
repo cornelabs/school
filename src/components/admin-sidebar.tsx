@@ -18,6 +18,7 @@ import {
     LogOut,
     Menu,
     X,
+    Mail,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
@@ -29,7 +30,7 @@ interface AdminSidebarProps {
         email: string;
         avatar_url?: string;
     };
-    activePage: 'dashboard' | 'courses' | 'users' | 'media' | 'settings';
+    activePage: 'dashboard' | 'courses' | 'users' | 'media' | 'settings' | 'emails';
 }
 
 const navItems = [
@@ -37,6 +38,7 @@ const navItems = [
     { key: 'courses', href: '/admin/courses', label: 'Courses', icon: BookOpen },
     { key: 'users', href: '/admin/users', label: 'Users', icon: Users },
     { key: 'media', href: '/admin/media', label: 'Media', icon: Video },
+    { key: 'emails', href: '/admin/emails', label: 'Emails', icon: Mail },
     { key: 'settings', href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 

@@ -80,10 +80,10 @@ export const InviteEmail = ({
                             </Button>
                         </Section>
                         <Text className="text-black text-[14px] leading-[24px]">
-                            If you need any help with access, content, or scheduling, contact: <a href="mailto:admin@school.cornelabs.com" className="text-[#10b981] font-medium no-underline">admin@school.cornelabs.com</a> or reply to this email.
+                            If you need any help with access, content, or scheduling, contact: <a href="mailto:hello@cornelabs.com" className="text-[#10b981] font-medium no-underline">hello@cornelabs.com</a> or reply to this email.
                         </Text>
                         <Text className="text-black text-[14px] leading-[24px] my-[16px]">
-                            See your inbox Module 1.
+                            See you in Module 1.
                         </Text>
                         <Text className="text-black text-[14px] leading-[24px]">
                             Happy learning,
