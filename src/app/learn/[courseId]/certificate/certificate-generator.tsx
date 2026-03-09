@@ -9,6 +9,9 @@ interface CertificateGeneratorProps {
     courseId: string;
     studentName: string;
     studentEmail: string;
+    /** Whether a certificate row exists in the DB (from server on load). */
+    certificateExists: boolean;
+    /** Reference no from DB if present (for View certificate link). */
     existingReferenceNo: string | null;
 }
 
@@ -16,14 +19,13 @@ export function CertificateGenerator({
     courseId,
     studentName,
     studentEmail,
+    certificateExists: initialCertificateExists,
     existingReferenceNo,
 }: CertificateGeneratorProps) {
     const [pending, setPending] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [certificateExists, setCertificateExists] = useState(initialCertificateExists);
     const [referenceNo, setReferenceNo] = useState<string | null>(existingReferenceNo);
-    const [generated, setGenerated] = useState(!!existingReferenceNo);
-
-    const showSuccess = generated || referenceNo != null;
 
     async function handleGenerate() {
         setPending(true);
@@ -31,7 +33,7 @@ export function CertificateGenerator({
         const result = await issueCertificateForCompletion(courseId, studentName, studentEmail);
         setPending(false);
         if (result.ok) {
-            setGenerated(true);
+            setCertificateExists(true);
             if (result.certificateReferenceNo) {
                 setReferenceNo(result.certificateReferenceNo);
             }
@@ -40,7 +42,7 @@ export function CertificateGenerator({
         }
     }
 
-    if (showSuccess) {
+    if (certificateExists) {
         return (
             <div className="flex flex-col items-center gap-2 pt-4 text-muted-foreground">
                 <p className="flex items-center gap-2 text-base">
