@@ -3,7 +3,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { getCurrentUser, getCourseWithContent, getUserProgress, isEnrolled, getCertificate } from "@/lib/supabase/queries";
 import { LessonSidebar } from "@/components/lesson-sidebar";
-import { Trophy, Mail, Sparkles, LayoutDashboard, ExternalLink } from "lucide-react";
+import { Trophy, Sparkles, LayoutDashboard } from "lucide-react";
+import { CertificateGenerator } from "./certificate-generator";
 
 interface CertificatePageProps {
     params: Promise<{ courseId: string }>;
@@ -32,24 +33,42 @@ export default async function CertificatePage({ params }: CertificatePageProps) 
 
     const certificate = await getCertificate(user.id, courseId);
 
+    const allLessonsCount = allLessons.length;
+
     return (
         <div className="min-h-screen bg-background">
             <LessonSidebar
                 course={course}
                 allLessons={allLessons}
-                currentLessonId="" // no lesson selected on certificate view
+                currentLessonId=""
                 progress={progress}
                 completedLessons={completedLessons}
                 overallProgress={overallProgress}
             />
 
-            <main className="lg:ml-72 min-h-screen flex flex-col items-center justify-center px-4 md:px-6 py-12 relative overflow-hidden">
-                {/* Decorative background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-50/80 via-background to-emerald-50/60 dark:from-amber-950/20 dark:via-background dark:to-emerald-950/20 pointer-events-none" />
-                <div className="absolute top-20 left-10 w-72 h-72 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute bottom-20 right-10 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
+            <main className="lg:ml-72">
+                {/* Top Bar - same as learn content pages */}
+                <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/50 bg-card px-4 md:px-6">
+                    <div className="flex items-center gap-2 min-w-0 text-sm">
+                        <Link href="/dashboard" className="text-muted-foreground hover:text-foreground shrink-0 hidden sm:flex items-center">
+                            <LayoutDashboard className="h-4 w-4 mr-1" />
+                            Dashboard
+                        </Link>
+                        <span className="text-muted-foreground hidden sm:inline">/</span>
+                        <span className="font-medium truncate">{course.title}</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground shrink-0 rounded-full px-2 py-0.5">
+                        {allLessonsCount} {allLessonsCount === 1 ? "lesson" : "lessons"}
+                    </span>
+                </header>
 
-                <div className="relative z-10 max-w-xl w-full text-center space-y-8">
+                <div className="flex flex-col items-center justify-center px-4 md:px-6 py-12 relative overflow-hidden min-h-[calc(100vh-3.5rem)]">
+                    {/* Decorative background */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-50/80 via-background to-emerald-50/60 dark:from-amber-950/20 dark:via-background dark:to-emerald-950/20 pointer-events-none" />
+                    <div className="absolute top-20 left-10 w-72 h-72 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute bottom-20 right-10 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl pointer-events-none" />
+
+                    <div className="relative z-10 max-w-xl w-full text-center space-y-8">
                     {/* Trophy and badge */}
                     <div className="flex justify-center">
                         <div className="relative">
@@ -71,25 +90,13 @@ export default async function CertificatePage({ params }: CertificatePageProps) 
                             You’ve completed the{" "}
                             <span className="text-amber-600 dark:text-amber-400">{course.title}</span> course.
                         </p>
-                        <div className="flex flex-col items-center gap-2 pt-4 text-muted-foreground">
-                            <p className="flex items-center gap-2 text-base">
-                                <Mail className="h-4 w-4 text-amber-500" />
-                                Your certificate has been sent to your email — please check your inbox.
-                            </p>
-                            {certificate?.certificate_reference_no && (
-                                <Button asChild variant="secondary" size="sm" className="mt-3 rounded-full">
-                                    <a
-                                        href={`https://credsverse.com/credentials/${certificate.certificate_reference_no}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-2"
-                                    >
-                                        <ExternalLink className="h-4 w-4" />
-                                        View certificate
-                                    </a>
-                                </Button>
-                            )}
-                        </div>
+                        <CertificateGenerator
+                            courseId={courseId}
+                            studentName={user.full_name ?? user.email ?? "Learner"}
+                            studentEmail={user.email ?? ""}
+                            certificateExists={!!certificate}
+                            existingReferenceNo={certificate?.certificate_reference_no ?? null}
+                        />
                     </div>
 
                     <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -104,6 +111,7 @@ export default async function CertificatePage({ params }: CertificatePageProps) 
                                 Dashboard
                             </Link>
                         </Button>
+                    </div>
                     </div>
                 </div>
             </main>
