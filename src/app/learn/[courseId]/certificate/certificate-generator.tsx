@@ -83,7 +83,9 @@ export function CertificateGenerator({
                 )}
             </Button>
             {error && (
-                <p className="text-sm text-destructive">{error}</p>
+                <p className="text-sm text-destructive">
+                    There was an error generating your certificate, please contact the administrator.
+                </p>
             )}
         </div>
     );
