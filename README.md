@@ -49,6 +49,10 @@ Create `.env.local`:
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+(certifier.io is the Certificate Generator Service)
+CERTIFIER_API_KEY=your_certifier_key
+CERTIFIER_GROUP_ID=your_certifier_group_id
 ```
 
 ### 4. Run Development Server
