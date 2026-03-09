@@ -12,6 +12,7 @@ import {
     ChevronRight,
 } from "lucide-react";
 import { getCurrentUser, getCourseWithContent, getUserProgress, isEnrolled } from "@/lib/supabase/queries";
+import { issueCertificateForCompletion } from "@/app/actions/certificate";
 import { VideoPlayer } from "@/components/video-player";
 import { ReadingContent } from "@/components/reading-content";
 import { YouTubePlayer } from "@/components/youtube-player";
@@ -72,6 +73,15 @@ export default async function LearnPage({ params, searchParams }: LearnPageProps
 
     // Check if current lesson is completed
     const isLessonCompleted = progress.some(p => p.lesson_id === currentLesson.id && p.completed);
+
+    // When course is 100% complete, ensure certificate is issued (idempotent)
+    if (overallProgress === 100 && user) {
+        await issueCertificateForCompletion(
+            courseId,
+            user.full_name ?? user.email ?? "Learner",
+            user.email ?? ""
+        );
+    }
 
     return (
         <div className="min-h-screen bg-background">
@@ -235,7 +245,7 @@ export default async function LearnPage({ params, searchParams }: LearnPageProps
                             </Button>
                         ) : overallProgress === 100 ? (
                             <Button className="h-9 px-4 text-xs rounded-full" asChild>
-                                <Link href="/dashboard">
+                                <Link href={`/learn/${courseId}/certificate`}>
                                     Complete Course
                                     <Check className="ml-1 h-3 w-3" />
                                 </Link>

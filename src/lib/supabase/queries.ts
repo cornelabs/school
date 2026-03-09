@@ -5,6 +5,7 @@ import type {
     Module,
     Lesson,
     Enrollment,
+    Certificate,
     CourseWithModules,
     ModuleWithLessons
 } from '@/types/database';
@@ -413,6 +414,24 @@ export async function updateWatchTime(lessonId: string, watchTimeSeconds: number
         });
 
     if (error) throw error;
+}
+
+// =============================================
+// CERTIFICATE QUERIES
+// =============================================
+
+export async function getCertificate(userId: string, courseId: string): Promise<Certificate | null> {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from('certificates')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('course_id', courseId)
+        .single();
+
+    if (error || !data) return null;
+    return data as Certificate;
 }
 
 // =============================================

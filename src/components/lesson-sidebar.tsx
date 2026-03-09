@@ -11,8 +11,8 @@ import {
 import {
     Play,
     Check,
-    X,
     Menu,
+    Trophy,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -168,6 +168,16 @@ function SidebarContent({
                         onNavClick={onNavClick}
                     />
                 ))}
+                {overallProgress === 100 && (
+                    <Link
+                        href={`/learn/${course.id}/certificate`}
+                        onClick={onNavClick}
+                        className="flex items-center gap-2 px-2 py-2.5 rounded-lg text-xs font-medium bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 transition-colors mt-2"
+                    >
+                        <Trophy className="h-4 w-4 shrink-0" />
+                        View certificate
+                    </Link>
+                )}
             </div>
         </div>
     );

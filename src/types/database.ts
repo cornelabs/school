@@ -109,6 +109,7 @@ export interface Certificate {
   user_id: string;
   course_id: string;
   certificate_number: string;
+  certificate_reference_no: string | null;
   issued_at: string;
 }
 

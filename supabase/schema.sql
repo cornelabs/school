@@ -112,6 +112,7 @@ create table public.certificates (
   user_id uuid references public.profiles(id) on delete cascade not null,
   course_id uuid references public.courses(id) on delete cascade not null,
   certificate_number text unique not null,
+  certificate_reference_no text,
   issued_at timestamp with time zone default timezone('utc'::text, now()) not null,
   unique(user_id, course_id)
 );
